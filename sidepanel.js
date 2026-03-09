@@ -34,6 +34,9 @@ const exportOptions = document.querySelectorAll('.export-option');
 
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+const progressWrapper = document.getElementById('progressWrapper');
+const progressBar = document.getElementById('progressBar');
+
 function cleanPdfText(rawText) {
   if (!rawText) return '';
   let text = rawText.replace(/([a-zA-Z]+)-\s+([a-zA-Z]+)/g, "$1$2");
@@ -44,25 +47,34 @@ function cleanPdfText(rawText) {
   return text.trim();
 }
 
-// ================= 大师级微型渲染引擎 =================
+// ================= 大师级微型渲染引擎 (终极版) =================
 function renderMarkdownAndMath(text) {
   if (!text) return '';
   let html = text;
 
-  // 1. 优先解析 LaTeX 公式：处理 \( ... \) 和 \[ ... \]
-  // 将数学公式提取出来，加上优雅的字体和背景，并处理上下标
-  const mathRegex = /(\\\(|\\\[)(.*?)(\\\)|\\\])/g;
-  html = html.replace(mathRegex, (match, open, mathContent, close) => {
-    let parsed = mathContent
-      // 处理带花括号的复杂上下标，如 _{10} 或 ^{ij}
+  // 提取通用公式解析逻辑 (处理上下标)
+  const parseMath = (mathContent) => {
+    return mathContent
       .replace(/_\{([^}]+)\}/g, '<sub>$1</sub>')
       .replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>')
-      // 处理单字符的简单上下标，如 _1 或 ^2
       .replace(/_([a-zA-Z0-9])/g, '<sub>$1</sub>')
       .replace(/\^([a-zA-Z0-9])/g, '<sup>$1</sup>');
+  };
 
-    // 给公式加上专属的数学衬线字体和极简的背景衬托
-    return `<span style="font-family: 'Cambria Math', 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 2px 4px; border-radius: 4px; border: 1px solid #f1f3f4; color: #1a73e8; margin: 0 2px;">${parsed}</span>`;
+  const mathStyle = `font-family: 'Cambria Math', 'Times New Roman', serif; font-style: italic; background: #f8f9fa; padding: 2px 4px; border-radius: 4px; border: 1px solid #f1f3f4; color: #1a73e8; margin: 0 2px;`;
+
+  // 1A. 解析标准 LaTeX 公式 \( ... \) 和 \[ ... \]
+  html = html.replace(/(\\\(|\\\[)(.*?)(\\\)|\\\])/g, (match, open, mathContent) => {
+    return `<span style="${mathStyle}">${parseMath(mathContent)}</span>`;
+  });
+
+  // 1B. 解析 Markdown 单美元符号公式 $ ... $ 
+  html = html.replace(/\$([^\$\n]+?)\$/g, (match, mathContent) => {
+    // 【大师级防御】如果是纯价格描述（如 $50 和 $60），里面没有字母或数学运算符，就原样返回，防止误伤美金符号
+    if (/^\s*\d/.test(mathContent) && !/[a-zA-Z=+\-*/_]/.test(mathContent)) {
+      return match; 
+    }
+    return `<span style="${mathStyle}">${parseMath(mathContent)}</span>`;
   });
 
   // 2. 解析 Markdown 标题 (### 标题)
@@ -72,11 +84,16 @@ function renderMarkdownAndMath(text) {
   // 3. 解析 Markdown 粗体 (**加粗**)
   html = html.replace(/\*\*(.*?)\*\*/g, '<strong style="color: #222;">$1</strong>');
 
-  // 4. 解析 Markdown 列表项 (- 或 *)
-  html = html.replace(/^[-*]\s+(.*)$/gm, '<div style="margin-left: 18px; position: relative; margin-bottom: 4px;"><span style="position: absolute; left: -14px; color: #1a73e8;">•</span>$1</div>');
+  // 4. 解析嵌套列表项 (支持前面的空格缩进)
+  html = html.replace(/^(\s*)[-*]\s+(.*)$/gm, (match, spaces, content) => {
+    // 核心算法：每多一个空格，左边距增加 8px，实现完美的子列表阶梯缩进
+    const indent = 18 + (spaces.length * 8); 
+    // 子列表的圆点换成空心圆或者较小的实心点，增加层级美感
+    const bulletType = spaces.length > 0 ? '◦' : '•';
+    return `<div style="margin-left: ${indent}px; position: relative; margin-bottom: 4px;"><span style="position: absolute; left: -14px; color: #1a73e8; font-size: ${spaces.length > 0 ? '12px' : 'inherit'};">${bulletType}</span>${content}</div>`;
+  });
 
   // 5. 智能处理换行符
-  // 将剩下的 \n 转为 <br>，但清理掉块级元素 (div) 旁边多余的换行，防止间距过大
   html = html.replace(/\n/g, '<br>');
   html = html.replace(/<\/div><br>/g, '</div>');
   html = html.replace(/<br><div/g, '<div');
@@ -109,10 +126,11 @@ async function callAIApiToSummarize(text, signal, maxRetries = 3) {
           messages: [
             { 
               role: 'system', 
-              content: `你是一个极其专业的学术和文档阅读助手。请你严格遵守以下三条规则：
-1. 【直入主题】：绝对不要使用“该页的核心内容为”、“为您总结如下”、“好的，这是本页的内容”等任何废话前缀，直接输出正文。
-2. 【智能降级OCR】：如果你发现用户提供的文本极少、或者全是不连贯的词汇（说明这一页可能主要是图片或空白），请直接放弃总结。你需要扮演OCR整理助手的角色，将这些零散的文字稍作排版后原封不动地输出。
-3. 【专业提炼】：在正常文本数量下，精准提炼核心观点、关键数据和结论，使用清晰的Markdown排版输出。` 
+              content: `你是一个极其专业的学术和文档阅读助手。请你严格遵守以下四条铁律：
+1. 【强制中文】：无论用户提供的 PDF 文本是什么语言，你都必须使用流畅的简体中文进行总结和输出！绝对不允许输出英文。
+2. 【格式封印】：绝对不允许使用 Markdown 表格（|---|）。如果遇到数据对比，请使用列表（- ）的形式进行排版。
+3. 【直入主题】：绝对不要使用“该页的核心内容为”、“为您总结如下”等废话前缀，直接输出正文。
+4. 【智能降级】：如果你发现用户提供的文本极少，请直接放弃总结，将这些零散文字稍作排版后输出。` 
             },
             { 
               role: 'user', 
@@ -157,21 +175,45 @@ async function callAIApiToSummarize(text, signal, maxRetries = 3) {
   }
 }
 
+// ================= 大师级页码解析引擎 (支持所有变态输入) =================
 function parsePageRange(input, maxPage) {
   if (!input) return [];
   const pages = new Set();
-  const parts = input.split(',');
+  
+  // 第一步：防御性清洗 (The Great Sanitization)
+  // 1. 把连字符前后的空格去掉，防止用户手滑打成 "2 - 5" 导致切割断裂
+  let sanitized = input.replace(/\s*-\s*/g, '-');
+  
+  // 2. 把所有的中文逗号（，）、英文逗号（,）全部替换为标准的空格
+  sanitized = sanitized.replace(/,|，/g, ' ');
+  
+  // 第二步：精准切割
+  // 现在的字符串只剩下数字、连字符和空格了。我们按“一个或多个连续空格”进行切割
+  const parts = sanitized.split(/\s+/);
+  
+  // 第三步：遍历提取
   for (let part of parts) {
-    if (!part.trim()) continue;
+    if (!part.trim()) continue; // 防御空字符串
+    
     if (part.includes('-')) {
-      const [start, end] = part.split('-').map(n => parseInt(n.trim(), 10));
-      if (isNaN(start) || isNaN(end) || start > end) continue;
-      for (let i = start; i <= end; i++) if (i >= 1 && i <= maxPage) pages.add(i);
+      // 处理范围，例如 "2-5"
+      const [start, end] = part.split('-').map(n => parseInt(n, 10));
+      // 确保是有效的数字，且起点小于等于终点
+      if (!isNaN(start) && !isNaN(end) && start <= end) {
+        for (let i = start; i <= end; i++) {
+          if (i >= 1 && i <= maxPage) pages.add(i);
+        }
+      }
     } else {
+      // 处理单页，例如 "3"
       const num = parseInt(part, 10);
-      if (!isNaN(num) && num >= 1 && num <= maxPage) pages.add(num);
+      if (!isNaN(num) && num >= 1 && num <= maxPage) {
+        pages.add(num);
+      }
     }
   }
+  
+  // 最后一步：转化为数组，并进行严格的数字升序排列
   return Array.from(pages).sort((a, b) => a - b);
 }
 
@@ -544,12 +586,17 @@ singleBtn.addEventListener('click', async () => {
   const inputVal = targetPageInput.value;
   if (!inputVal.trim()) return statusEl.textContent = "⚠️ 请输入要处理的页码！";
   setButtonsState(true); abortController = new AbortController();
+  
   try {
     const pdf = await getActivePdf();
     const targetPages = parsePageRange(inputVal, pdf.numPages);
-    if (targetPages.length === 0) return statusEl.textContent = `⚠️ 页码越界！`;
+    const totalTasks = targetPages.length;
+    if (totalTasks === 0) return statusEl.textContent = `⚠️ 页码越界！`;
 
-    for (let i = 0; i < targetPages.length; i++) {
+    // 【大师级控制】如果任务大于1个，展示进度条并归零
+    if (totalTasks > 1) { progressWrapper.style.display = 'block'; progressBar.style.width = '0%'; }
+
+    for (let i = 0; i < totalTasks; i++) {
       const pageNum = targetPages[i];
       if (abortController.signal.aborted) { statusEl.textContent = "⚠️ 已中断。"; break; }
       if (i > 0) await sleep(1500); 
@@ -559,12 +606,20 @@ singleBtn.addEventListener('click', async () => {
       const text = cleanPdfText((await page.getTextContent()).items.map(item => item.str).join(' '));
       const summary = await callAIApiToSummarize(text, abortController.signal);
       
-      // 保留可能存在的旧笔记
       const existingData = await getExistingPageData(pageNum);
       renderPageCard(pageNum, { summary: summary, note: existingData.note }, false, true); 
+      
+      // 【大师级控制】步进更新进度条
+      if (totalTasks > 1) { progressBar.style.width = `${((i + 1) / totalTasks) * 100}%`; }
     }
     if (!abortController.signal.aborted) statusEl.textContent = `🎉 总结完成！`;
-  } catch (error) { if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; } finally { setButtonsState(false); }
+  } catch (error) { 
+    if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; 
+  } finally { 
+    setButtonsState(false); 
+    // 【大师级控制】任务结束后，让用户看满格1秒钟，然后平滑隐藏
+    setTimeout(() => { progressWrapper.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
+  }
 });
 
 // 新增功能：一键生成空白笔记
@@ -589,17 +644,31 @@ startBtn.addEventListener('click', async () => {
   setButtonsState(true); abortController = new AbortController();
   try {
     const pdf = await getActivePdf(); clearCanvas();
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+    const totalTasks = pdf.numPages;
+    
+    // 【大师级控制】全局总结，必定展示进度条
+    progressWrapper.style.display = 'block'; progressBar.style.width = '0%';
+
+    for (let pageNum = 1; pageNum <= totalTasks; pageNum++) {
       if (abortController.signal.aborted) { statusEl.textContent = "⚠️ 已中断。"; break; }
       if (pageNum > 1) await sleep(1500); 
-      statusEl.textContent = `🤖 总结第 ${pageNum}/${pdf.numPages} 页...`;
+      statusEl.textContent = `🤖 总结第 ${pageNum}/${totalTasks} 页...`;
       const text = cleanPdfText((await (await pdf.getPage(pageNum)).getTextContent()).items.map(item => item.str).join(' '));
       const summary = await callAIApiToSummarize(text, abortController.signal);
       const existingData = await getExistingPageData(pageNum);
       renderPageCard(pageNum, { summary: summary, note: existingData.note }, false, true);
+      
+      // 【大师级控制】步进更新进度条
+      progressBar.style.width = `${(pageNum / totalTasks) * 100}%`;
     }
     if (!abortController.signal.aborted) statusEl.textContent = "🎉 全部总结完成！";
-  } catch (error) { if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; } finally { setButtonsState(false); }
+  } catch (error) { 
+    if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; 
+  } finally { 
+    setButtonsState(false);
+    // 【大师级控制】延迟 1 秒隐藏
+    setTimeout(() => { progressWrapper.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
+  }
 });
 
 stopBtn.addEventListener('click', () => { if (abortController) abortController.abort(); });
