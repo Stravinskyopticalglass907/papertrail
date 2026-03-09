@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaperTrail - PDF 智能伴读与笔记</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { brand: '#1a73e8', brandHover: '#1557b0' }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* 添加一点平滑滚动和基础动画 */
+    html { scroll-behavior: smooth; }
+    .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased selection:bg-brand selection:text-white">
+
+  <nav class="fixed w-full z-50 glass-card shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center h-16">
+        <div class="flex-shrink-0 flex items-center gap-2">
+          <span class="text-2xl">📑</span>
+          <span class="font-bold text-xl tracking-tight text-gray-900">PaperTrail</span>
+        </div>
+        <div>
+          <a href="#install" class="text-sm font-medium text-gray-600 hover:text-brand transition mr-4">安装指南</a>
+          <a href="#features" class="text-sm font-medium text-gray-600 hover:text-brand transition mr-4">核心功能</a>
+          <a href="#install" class="bg-brand text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-brandHover transition shadow-md">获取插件</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <section class="pt-32 pb-20 px-4 text-center">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tight leading-tight mb-6">
+        把厚书读薄，<br class="hidden md:block" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">把薄页读透。</span>
+      </h1>
+      <p class="text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+        专注“逐页精读”与“知识沉淀”的 Chrome 侧边栏 AI 伴读工具。拒绝囫囵吞枣的全文总结，陪你一页一页拆解硬核知识。
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4 mb-16">
+        <a href="#install" class="bg-brand text-white px-8 py-4 rounded-xl text-lg font-bold hover:bg-brandHover transition shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+          <span>📥 免费下载 v1.0 (ZIP)</span>
+        </a>
+        <a href="https://modelscope.cn/my/myaccesstoken" target="_blank" class="bg-white text-gray-700 border border-gray-200 px-8 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition shadow-sm flex items-center justify-center gap-2">
+          <span>🔑 获取免费 API Key</span>
+        </a>
+      </div>
+
+      <div class="relative mx-auto w-full max-w-5xl rounded-2xl shadow-2xl overflow-hidden border border-gray-200 bg-white">
+        <div class="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
+          <div class="w-3 h-3 rounded-full bg-red-400"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+          <div class="text-xs text-gray-400 ml-2 font-mono">PaperTrail - 演示演示</div>
+        </div>
+        <div class="aspect-video bg-gray-50 flex items-center justify-center">
+          <p class="text-gray-400 font-medium">✨ 请在此处替换为你的高质量产品演示 GIF 图 ✨</p>
+          </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl font-extrabold text-gray-900">为重度阅读者量身定制</h2>
+        <p class="mt-4 text-lg text-gray-500">摒弃花哨的噱头，只做最硬核的知识提取。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">🤖</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">像素级逐页提炼</h3>
+          <p class="text-gray-600 leading-relaxed">指定任意页码，精准调用 DeepSeek 等大模型。过滤废话前缀，遇到纯图表自动降级为 OCR 提取，绝不产生 AI 幻觉。</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📝</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">双轨制沉浸批注</h3>
+          <p class="text-gray-600 leading-relaxed">上方看 AI 总结，下方写私人笔记。支持一键生成空白笔记卡片，失焦瞬间极速落盘保存，无需手动点击，永不丢失灵感。</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">⚡️</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">幽灵侧边栏与预加载</h3>
+          <p class="text-gray-600 leading-relaxed">基于上下文感知，仅在打开 PDF 时现身。独创乐观预加载架构，二次打开同一文档时，历史记录 0 毫秒瞬间上墙。</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition">
+          <div class="text-4xl mb-4">📦</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">知识沉淀闭环</h3>
+          <p class="text-gray-600 leading-relaxed">内置零依赖正则渲染引擎，完美解析 LaTeX 公式。支持一键导出纯净 Markdown，可自由组合总结与笔记，无缝接入 Notion / Obsidian。</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:shadow-lg transition md:col-span-2">
+          <div class="text-4xl mb-4">🔐</div>
+          <h3 class="text-xl font-bold text-gray-900 mb-3">纯本地 Serverless 架构 (BYOK)</h3>
+          <p class="text-gray-600 leading-relaxed">没有任何居心叵测的后台服务器。插件采用 Bring Your Own Key 模式，你的密钥和所有笔记仅加密保存在浏览器的本地沙箱中，数据绝对不出域。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="install" class="py-20 bg-gray-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-extrabold text-white">极客安装指南</h2>
+        <p class="mt-4 text-lg text-gray-400">只需 1 分钟，开启你的高阶阅读体验</p>
+      </div>
+
+      <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-2xl">
+        <ol class="space-y-6 text-gray-300 list-decimal list-inside text-lg">
+          <li class="pl-2">下载本项目的 <span class="text-brand font-bold bg-gray-900 px-2 py-1 rounded">.zip 压缩包</span>，并解压到一个固定的文件夹。</li>
+          <li class="pl-2">打开 Chrome，在地址栏输入 <code class="text-pink-400 bg-gray-900 px-2 py-1 rounded text-sm">chrome://extensions/</code> 并回车。</li>
+          <li class="pl-2">开启页面右上角的 <strong>“开发者模式”</strong> 开关。</li>
+          <li class="pl-2">点击左上角的 <strong>“加载已解压的扩展程序”</strong>，选择刚刚解压的文件夹。</li>
+          <li class="pl-2 text-yellow-400">
+            <strong>⚠️ 极其重要：</strong>如需在本地 PDF (电脑里的文件) 上使用，请点击插件的“详细信息”，并打开 <strong>“允许访问文件网址”</strong>。
+          </li>
+        </ol>
+        <div class="mt-10 p-6 bg-brand bg-opacity-10 rounded-xl border border-brand border-opacity-30">
+          <h4 class="text-brand font-bold mb-2">💡 首次使用提示：</h4>
+          <p class="text-sm text-gray-300 leading-relaxed">
+            打开任意 PDF 后，点击侧边栏右上角的【⚙️ 设置】按钮，填入您的 ModelScope API Key 即可起飞。（推荐选用 DeepSeek-V3.2 或 Qwen 模型）
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="bg-gray-50 py-10 border-t border-gray-200 text-center">
+    <p class="text-gray-500 text-sm">
+      &copy; 2026 PaperTrail. 专注知识沉淀。 <br class="sm:hidden"/> 
+      Powered by <a href="https://modelscope.cn/" target="_blank" class="text-brand hover:underline">ModelScope API</a>
+    </p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "PaperTrail: PDF 智能伴读与笔记",
+  "version": "1.0",
+  "description": "专注“逐页精读”与“知识沉淀”的 PDF 侧边栏伴读工具",
+  "permissions": [
+    "sidePanel",
+    "activeTab",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://api-inference.modelscope.cn/*",
+    "<all_urls>" 
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "打开 PaperTrail 侧边栏"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

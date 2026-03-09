@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF 总结助手 - 设置</title>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #333; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+    .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 400px; }
+    h2 { margin-top: 0; color: #1a73e8; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-weight: bold; margin-bottom: 8px; font-size: 14px; }
+    input[type="password"], input[type="text"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: monospace; font-size: 14px; }
+    .help-text { font-size: 12px; color: #666; margin-top: 8px; line-height: 1.5; }
+    .help-text a { color: #1a73e8; text-decoration: none; }
+    .help-text a:hover { text-decoration: underline; }
+    button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    button:hover { background-color: #1557b0; }
+    #status { margin-top: 15px; text-align: center; font-size: 14px; color: #34a853; font-weight: bold; min-height: 20px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>⚙️ 插件核心设置</h2>
+    
+    <div class="form-group">
+      <label for="apiKey">ModelScope API Key (鉴权密钥)</label>
+      <input type="password" id="apiKey" placeholder="例如: ms-xxxxxx..." autocomplete="off">
+      <div class="help-text">
+        🔒 你的密钥仅会加密保存在当前浏览器的本地存储中，绝对不会上传至第三方服务器。<br><br>
+        👉 <a href="https://modelscope.cn/my/myaccesstoken" target="_blank">点击这里前往 ModelScope 获取免费的 API Key</a>
+      </div>
+    </div>
+    
+    <button id="saveBtn">💾 保存配置</button>
+    <div id="status"></div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
