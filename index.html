@@ -118,18 +118,30 @@
 
       <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700 shadow-2xl">
         <ol class="space-y-6 text-gray-300 list-decimal list-inside text-lg">
-          <li class="pl-2">点击下载 <a href="https://github.com/sjksndnfkwks/papertrail/releases/download/papertrail1.1/papertrail_1.1.zip" class="text-brand font-bold bg-gray-900 px-2 py-1 rounded hover:underline transition">papertrail_1.0.zip 压缩包</a>，并解压到一个固定的文件夹。</li>          <li class="pl-2">打开 Chrome，在地址栏输入 <code class="text-pink-400 bg-gray-900 px-2 py-1 rounded text-sm">chrome://extensions/</code> 并回车。</li>
-          <li class="pl-2">开启页面右上角的 <strong>“开发者模式”</strong> 开关。</li>
-          <li class="pl-2">点击左上角的 <strong>“加载已解压的扩展程序”</strong>，选择刚刚解压的文件夹。</li>
+          <li class="pl-2 text-brand font-bold">
+            准备工作：前往 <a href="https://modelscope.cn/my/myaccesstoken" target="_blank" class="underline decoration-2 underline-offset-4">ModelScope 控制台</a> 获取您的免费 API Key。
+          </li>
+          
+          <li class="pl-2">点击下载 <a href="https://github.com/sjksndnfkwks/papertrail/releases/download/papertrail1.1/papertrail_1.1.zip" class="text-white font-bold bg-gray-900 px-2 py-1 rounded hover:underline transition border border-gray-700">papertrail_1.1.zip 压缩包</a>，并解压。</li>
+          
+          <li class="pl-2">打开 Chrome，进入 <code class="text-pink-400 bg-gray-900 px-2 py-1 rounded text-sm">chrome://extensions/</code> 并开启右上角 <strong>“开发者模式”</strong>。</li>
+          
+          <li class="pl-2">点击 <strong>“加载已解压的扩展程序”</strong>，选择刚刚解压的文件夹。</li>
+          
           <li class="pl-2 text-yellow-400">
-            <strong>⚠️ 极其重要：</strong>如需在本地 PDF (电脑里的文件) 上使用，请点击插件的“详细信息”，并打开 <strong>“允许访问文件网址”</strong>。
+            <strong>⚠️ 必要操作：</strong>在插件详情页中，务必打开 <strong>“允许访问文件网址”</strong>，否则无法读取本地 PDF。
           </li>
         </ol>
-        <div class="mt-10 p-6 bg-brand bg-opacity-10 rounded-xl border border-brand border-opacity-30">
-          <h4 class="text-brand font-bold mb-2">💡 首次使用提示：</h4>
-          <p class="text-sm text-gray-300 leading-relaxed">
-            打开任意 PDF 后，点击侧边栏右上角的【⚙️ 设置】按钮，填入您的 ModelScope API Key 即可起飞。（推荐选用 DeepSeek-V3.2 或 Qwen 模型）
-          </p>
+
+        <div class="mt-10 p-6 bg-brand bg-opacity-10 rounded-xl border border-brand border-opacity-30 flex gap-4 items-start">
+          <div class="text-2xl">🚀</div>
+          <div>
+            <h4 class="text-brand font-bold mb-2">如何激活 AI 能力？</h4>
+            <p class="text-sm text-gray-300 leading-relaxed">
+              打开任意 PDF 后，点击侧边栏右上角的 <strong>【⚙️ 设置】</strong> 按钮。在弹窗中粘贴您在第 0 步获取的 API Key 并保存。
+              <span class="block mt-2 text-gray-400">推荐配置：模型服务商选 ModelScope，模型 ID 填 <code class="bg-gray-900 px-1 rounded text-brand">deepseek-ai/DeepSeek-V3</code> 即可享受极致推理体验。</span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -143,5 +155,6 @@
   </footer>
 
 </body>
+
 
 </html>
