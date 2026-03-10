@@ -107,7 +107,7 @@ async function callAIApiToSummarize(text, signal, maxRetries = 3) {
   if (text.trim().length < 15) {
     return "⚠️ **未能提取到有效文本**<br>本页可能是纯图片、扫描件或空白排版。无法进行 AI 总结。";
   }
-  // 获取 Key 和 模型。如果没有保存过模型，使用 DeepSeek-V3 兜底
+  // 获取 Key 和 模型。如果没有保存过模型，使用 DeepSeek-V3.2 兜底
   const storageData = await chrome.storage.local.get(['apiKey', 'aiModel']);
   const apiKey = storageData.apiKey;
   const aiModel = storageData.aiModel || 'deepseek-ai/DeepSeek-V3.2'; 
@@ -147,7 +147,6 @@ async function callAIApiToSummarize(text, signal, maxRetries = 3) {
       
       const errorText = await response.text();
       
-      // 【大师级报错拦截】
       if (response.status === 401) {
         throw new Error("API Key 无效或已过期，请重新填写！");
       }
@@ -175,7 +174,7 @@ async function callAIApiToSummarize(text, signal, maxRetries = 3) {
   }
 }
 
-// ================= 大师级页码解析引擎 (支持所有变态输入) =================
+// ================= 页码解析引擎 (支持所有变态输入) =================
 function parsePageRange(input, maxPage) {
   if (!input) return [];
   const pages = new Set();
@@ -273,7 +272,7 @@ exportOptions.forEach(btn => {
     
     let hasContent = false;
     Object.keys(doc.pages).sort((a, b) => parseInt(a) - parseInt(b)).forEach(pageNum => {
-      // 大师级数据兼容：将旧的字符串格式转为对象
+      // 将旧的字符串格式转为对象
       let pageData = doc.pages[pageNum];
       if (typeof pageData === 'string') pageData = { summary: pageData, note: '' };
 
@@ -326,7 +325,7 @@ async function savePageDataToStorage(fingerprint, fileName, pageNum, newSummary,
   await chrome.storage.local.set({ pdfDatabase: db });
 }
 
-// ================= 大师级渲染逻辑 (支持卡片与笔记混合) =================
+// ================= 渲染逻辑 (支持卡片与笔记混合) =================
 
 // pageData 参数结构: { summary: "...", note: "..." }
 function renderPageCard(pageNum, pageData, isPrepend = false, shouldSave = true, forceRender = false) {
@@ -340,7 +339,7 @@ function renderPageCard(pageNum, pageData, isPrepend = false, shouldSave = true,
   const existingDot = navTrack.querySelector(`.nav-dot[data-page-num="${pageNum}"]`);
   if (existingDot) existingDot.remove();
 
-  // 【修改点2】如果不是强制渲染，且没有任何内容，才拒绝渲染
+  // 如果不是强制渲染，且没有任何内容，才拒绝渲染
   if (!pageData.summary && !pageData.note && !forceRender) return;
 
   const pageDiv = document.createElement('div');
@@ -373,14 +372,14 @@ function renderPageCard(pageNum, pageData, isPrepend = false, shouldSave = true,
   if (pageData.summary) {
     const summaryDiv = document.createElement('div');
     summaryDiv.className = 'summary-content';
-    // 【大师级调用】让文本经过我们的渲染引擎洗礼再上墙
+    // 让文本经过我们的渲染引擎洗礼再上墙
     summaryDiv.innerHTML = renderMarkdownAndMath(pageData.summary);
     pageDiv.appendChild(summaryDiv);
   }
 
   const noteContainer = document.createElement('div');
   noteContainer.className = 'note-container';
-  // 【修改点3】如果是强制渲染空白笔记，必须把文本框展开显示出来！
+  // 如果是强制渲染空白笔记，必须把文本框展开显示出来！
   noteContainer.style.display = (pageData.note || forceRender) ? 'flex' : 'none';
   
   noteContainer.innerHTML = `
@@ -398,7 +397,7 @@ function renderPageCard(pageNum, pageData, isPrepend = false, shouldSave = true,
     if (isHidden) textarea.focus(); // 展开时自动聚焦
   });
 
-  // 事件绑定：笔记自动保存 (大师级：使用 blur 事件防抖，避免高频写库)
+  // 事件绑定：笔记自动保存 (使用 blur 事件防抖，避免高频写库)
   textarea.addEventListener('blur', () => {
     const newNote = textarea.value.trim();
     if (newNote !== pageData.note) {
@@ -516,7 +515,7 @@ async function getActivePdf() {
   currentFileName = decodeURIComponent(tab.url.split('/').pop().split('#')[0].split('?')[0]) || '未知文档.pdf'; 
   currentPdfUrl = tab.url; 
 
-  // ================= 大师级性能优化：乐观预加载 (Optimistic UI) =================
+  // ================= 性能优化：乐观预加载 (Optimistic UI) =================
   // 1. 绝不等待 PDF 网络下载，优先从硬盘极速读取数据库
   const data = await chrome.storage.local.get('pdfDatabase');
   const db = data.pdfDatabase || {};
@@ -545,7 +544,7 @@ async function getActivePdf() {
       clearCanvas();
   }
 
-  // 3. 【神级细节】：让出主线程 50 毫秒，确保浏览器有足够的时间把上面的卡片画到屏幕上
+  // 3. 让出主线程 50 毫秒，确保浏览器有足够的时间把上面的卡片画到屏幕上
   await sleep(50);
 
   // 4. 在后台静默执行沉重的 PDF 解析任务 (再慢也不会卡住界面了)
@@ -593,7 +592,7 @@ singleBtn.addEventListener('click', async () => {
     const totalTasks = targetPages.length;
     if (totalTasks === 0) return statusEl.textContent = `⚠️ 页码越界！`;
 
-    // 【大师级控制】如果任务大于1个，展示进度条并归零
+    // 如果任务大于1个，展示进度条并归零
     if (totalTasks > 1) { progressWrapper.style.display = 'block'; progressBar.style.width = '0%'; }
 
     for (let i = 0; i < totalTasks; i++) {
@@ -609,7 +608,7 @@ singleBtn.addEventListener('click', async () => {
       const existingData = await getExistingPageData(pageNum);
       renderPageCard(pageNum, { summary: summary, note: existingData.note }, false, true); 
       
-      // 【大师级控制】步进更新进度条
+      // 步进更新进度条
       if (totalTasks > 1) { progressBar.style.width = `${((i + 1) / totalTasks) * 100}%`; }
     }
     if (!abortController.signal.aborted) statusEl.textContent = `🎉 总结完成！`;
@@ -617,7 +616,7 @@ singleBtn.addEventListener('click', async () => {
     if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; 
   } finally { 
     setButtonsState(false); 
-    // 【大师级控制】任务结束后，让用户看满格1秒钟，然后平滑隐藏
+    // 任务结束后，让用户看满格1秒钟，然后平滑隐藏
     setTimeout(() => { progressWrapper.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
   }
 });
@@ -633,7 +632,7 @@ noteBtn.addEventListener('click', async () => {
 
     for (const pageNum of targetPages) {
       const existingData = await getExistingPageData(pageNum);
-      // 【修改点4】在最后传入 `true`，激活 forceRender 强制渲染开关
+      // 在最后传入 `true`，激活 forceRender 强制渲染开关
       renderPageCard(pageNum, existingData, false, true, true);
     }
     statusEl.textContent = `✅ 笔记卡片已生成，请直接输入。`;
@@ -646,7 +645,7 @@ startBtn.addEventListener('click', async () => {
     const pdf = await getActivePdf(); clearCanvas();
     const totalTasks = pdf.numPages;
     
-    // 【大师级控制】全局总结，必定展示进度条
+    // 全局总结，必定展示进度条
     progressWrapper.style.display = 'block'; progressBar.style.width = '0%';
 
     for (let pageNum = 1; pageNum <= totalTasks; pageNum++) {
@@ -658,7 +657,7 @@ startBtn.addEventListener('click', async () => {
       const existingData = await getExistingPageData(pageNum);
       renderPageCard(pageNum, { summary: summary, note: existingData.note }, false, true);
       
-      // 【大师级控制】步进更新进度条
+      // 步进更新进度条
       progressBar.style.width = `${(pageNum / totalTasks) * 100}%`;
     }
     if (!abortController.signal.aborted) statusEl.textContent = "🎉 全部总结完成！";
@@ -666,7 +665,7 @@ startBtn.addEventListener('click', async () => {
     if (error.name !== 'AbortError') statusEl.textContent = "❌ " + error.message; 
   } finally { 
     setButtonsState(false);
-    // 【大师级控制】延迟 1 秒隐藏
+    // 任务结束后，让用户看满格1秒钟，然后平滑隐藏
     setTimeout(() => { progressWrapper.style.display = 'none'; progressBar.style.width = '0%'; }, 1000);
   }
 });

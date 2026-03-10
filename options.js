@@ -1,5 +1,3 @@
-// options.js
-
 // 页面加载完毕后，尝试读取已保存的 API Key
 document.addEventListener('DOMContentLoaded', async () => {
   const data = await chrome.storage.local.get('apiKey');
